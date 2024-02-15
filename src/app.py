@@ -43,14 +43,19 @@ def logout():
     return redirect(url_for('login'))
     
 @app.route('/home')
+@login_required
 def home():
     return render_template('home.html')
 
+def status401(error):
+   return redirect(url_for('login'))
+
 def status404(error):
-    return '<h1>Página no encontrada</h1>', 404
+    return render_template('notFound.html'), 404
 
 if __name__ == '__main__':
     app.config.from_object(config['development'])
     csrf.init_app(app)
+    app.register_error_handler(401, status401)
     app.register_error_handler(404, status404)
     app.run()
