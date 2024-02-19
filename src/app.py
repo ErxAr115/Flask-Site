@@ -1,3 +1,4 @@
+import json
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_mysqldb import MySQL
@@ -47,11 +48,31 @@ def logout():
 def home():
     return render_template('home.html')
 
+@app.route('/categorias')
+def categorias():
+    try:
+        cursor = db.connection.cursor()
+        sql = "SELECT COUNT(id) FROM registro_test GROUP BY categoria ORDER BY categoria ASC"
+        cursor.execute(sql)
+        row = cursor.fetchall()
+        data = convertToList(row)
+        print(data)
+        cursor.close()
+    except Exception as ex:
+        raise Exception(ex)
+    return render_template('categorias.html', data=data)
 def status401(error):
    return redirect(url_for('login'))
 
 def status404(error):
     return render_template('notFound.html'), 404
+
+def convertToList(row):
+    lista_numeros = []
+    for element in row:
+        num = element[0]
+        lista_numeros.append(num)
+    return lista_numeros
 
 if __name__ == '__main__':
     app.config.from_object(config['development'])
