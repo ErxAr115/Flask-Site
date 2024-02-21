@@ -23,7 +23,7 @@
 
 <div class="container">
     <h4>Bienvenido, {{ current_user.fullname }}</h4>
-    <a type="button" class="btn btn-info" href="#">Fechas</a>
+    <a type="button" class="btn btn-info" href="{{ url_for('fechas') }}">Fechas</a>
     <a type="button" class="btn btn-info" href="{{ url_for('categorias') }}">Categorias</a>
 </div>
 {% endblock %}

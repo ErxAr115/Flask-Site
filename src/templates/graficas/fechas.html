@@ -1,0 +1,55 @@
+{% extends './base.html' %}
+
+{% block title %}Asistencia Virtual{% endblock %}
+
+{% block customCSS %}
+<style>
+    .container{
+        width: 500px;
+        height: 500px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<h1>Categorias entre fechas</h1>
+<form action="/fechas" method="post">
+    <label for="From">Fecha De Inicio:</label>
+    <input type="date" name="From" id="From">
+    <br>
+    <label for="To">Fecha Final:</label>
+    <input type="date" name="To" id="To">
+    <br>
+    <button type="submit">Buscar</button>
+</form>
+
+<div class="container">
+    <canvas id="myChart"></canvas>
+</div>
+
+<script>
+    var info = JSON.parse('{{ data }}');
+    var labels = JSON.parse('{{ labels }}')
+    console.log(info)
+    const ctx = document.getElementById('myChart');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: [labels],
+        datasets: [{
+          label: 'Mensajes Por Categoría',
+          data: info,
+          backgroundColor: [
+            'rgb(1, 190, 254)',
+            'rgb(255, 221, 0)',
+            'rgb(255, 125, 0)',
+            'rgb(255, 0, 109)',
+            'rgb(173, 255, 2)',
+            'rgb(143, 0, 255)'
+          ],
+          hoverOffset: 4
+        }]
+      }
+    });
+</script>
+{% endblock %}

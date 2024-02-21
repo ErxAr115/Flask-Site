@@ -1,14 +1,15 @@
 import json
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_mysqldb import MySQL
 from flask_wtf.csrf import CSRFProtect
 from config import config
 from models.ModelUser import ModelUser
 from models.entities.User import User
+from datetime import datetime
 
 app = Flask(__name__)
-csrf = CSRFProtect()
+#csrf = CSRFProtect()
 db = MySQL(app)
 login_manager_app = LoginManager(app)
 
@@ -55,28 +56,49 @@ def categorias():
         sql = "SELECT COUNT(id) FROM registro_test GROUP BY categoria ORDER BY categoria ASC"
         cursor.execute(sql)
         row = cursor.fetchall()
-        data = convertToList(row)
+        data = convertToList(row, 0)
         print(data)
         cursor.close()
     except Exception as ex:
         raise Exception(ex)
-    return render_template('categorias.html', data=data)
+    return render_template('graficas/categorias.html', data=data)
+
+@app.route('/fechas', methods=['GET', 'POST'])
+def fechas():
+    if request.method == 'POST':
+        try:
+            From = request.form['From']
+            To = request.form['To']
+            cursor = db.connection.cursor()
+            sql = "SELECT categoria, COUNT(id) FROM registro_test WHERE fecha_hora BETWEEN '{}' AND '{}' GROUP BY categoria".format(From, To)
+            cursor.execute(sql)
+            row = cursor.fetchall()
+            labels = convertToList(row, 0)
+            data = convertToList(row, 1)
+            labels = json.dumps(labels)
+            cursor.close()
+        except Exception as ex:
+            raise Exception(ex)
+        return render_template('graficas/fechas.html', data=data, labels=labels)
+    else:
+        return render_template('graficas/fechas.html')
+
 def status401(error):
    return redirect(url_for('login'))
 
 def status404(error):
     return render_template('notFound.html'), 404
 
-def convertToList(row):
+def convertToList(row, indice):
     lista_numeros = []
     for element in row:
-        num = element[0]
+        num = element[indice]
         lista_numeros.append(num)
     return lista_numeros
 
 if __name__ == '__main__':
     app.config.from_object(config['development'])
-    csrf.init_app(app)
+    #csrf.init_app(app)
     app.register_error_handler(401, status401)
     app.register_error_handler(404, status404)
     app.run()
