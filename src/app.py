@@ -2,14 +2,12 @@ import json
 from flask import Flask, jsonify, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_mysqldb import MySQL
-from flask_wtf.csrf import CSRFProtect
 from config import config
 from models.ModelUser import ModelUser
 from models.entities.User import User
 from datetime import datetime
 
 app = Flask(__name__)
-#csrf = CSRFProtect()
 db = MySQL(app)
 login_manager_app = LoginManager(app)
 
@@ -70,16 +68,16 @@ def fechas():
             From = request.form['From']
             To = request.form['To']
             cursor = db.connection.cursor()
-            sql = "SELECT categoria, COUNT(id) FROM registro_test WHERE fecha_hora BETWEEN '{}' AND '{}' GROUP BY categoria".format(From, To)
+            sql = "SELECT categoria, COUNT(id) FROM registro_test WHERE fecha_hora BETWEEN '{}' AND '{}' GROUP BY categoria ORDER By categoria ASC".format(From, To)
             cursor.execute(sql)
             row = cursor.fetchall()
             labels = convertToList(row, 0)
             data = convertToList(row, 1)
-            labels = json.dumps(labels)
+            print(labels)
             cursor.close()
         except Exception as ex:
             raise Exception(ex)
-        return render_template('graficas/fechas.html', data=data, labels=labels)
+        return render_template('graficas/fechas.html', data=data, labels=labels,)
     else:
         return render_template('graficas/fechas.html')
 
@@ -98,7 +96,6 @@ def convertToList(row, indice):
 
 if __name__ == '__main__':
     app.config.from_object(config['development'])
-    #csrf.init_app(app)
     app.register_error_handler(401, status401)
     app.register_error_handler(404, status404)
     app.run()

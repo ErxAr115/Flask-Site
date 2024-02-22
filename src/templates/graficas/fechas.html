@@ -28,14 +28,14 @@
 </div>
 
 <script>
-    var info = JSON.parse('{{ data }}');
-    var labels = JSON.parse('{{ labels }}')
-    console.log(info)
+    const info = JSON.parse('{{ data }}');
+    var etiquetas = ('{{ labels|tojson }}');
+    const lbls = JSON.parse(etiquetas)
     const ctx = document.getElementById('myChart');
     new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: [labels],
+        labels: lbls,
         datasets: [{
           label: 'Mensajes Por Categoría',
           data: info,
