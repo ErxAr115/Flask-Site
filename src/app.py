@@ -70,14 +70,12 @@ def fechas():
             cursor = db.connection.cursor()
             sql = "SELECT categoria, COUNT(id) FROM registro_test WHERE fecha_hora BETWEEN '{}' AND '{}' GROUP BY categoria ORDER By categoria ASC".format(From, To)
             cursor.execute(sql)
-            row = cursor.fetchall()
-            labels = convertToList(row, 0)
-            data = convertToList(row, 1)
-            print(labels)
+            data = cursor.fetchall()
             cursor.close()
+            print(data)
         except Exception as ex:
             raise Exception(ex)
-        return render_template('graficas/fechas.html', data=data, labels=labels,)
+        return render_template('graficas/fechas.html', data=data)
     else:
         return render_template('graficas/fechas.html')
 
