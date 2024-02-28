@@ -51,15 +51,14 @@ def home():
 def categorias():
     try:
         cursor = db.connection.cursor()
-        sql = "SELECT COUNT(id) FROM registro_test GROUP BY categoria ORDER BY categoria ASC"
+        sql = "SELECT categoria, COUNT(id) FROM registro_test GROUP BY categoria ORDER BY categoria ASC"
         cursor.execute(sql)
-        row = cursor.fetchall()
-        data = convertToList(row, 0)
+        data = cursor.fetchall()
         print(data)
         cursor.close()
     except Exception as ex:
         raise Exception(ex)
-    return render_template('graficas/categorias.html', data=data)
+    return render_template('graficas/categorias.html', data = data)
 
 @app.route('/fechas', methods=['GET', 'POST'])
 def fechas():
@@ -75,7 +74,7 @@ def fechas():
             print(data)
         except Exception as ex:
             raise Exception(ex)
-        return render_template('graficas/fechas.html', data=data)
+        return render_template('graficas/fechas.html', data = data)
     else:
         return render_template('graficas/fechas.html')
 

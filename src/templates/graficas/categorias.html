@@ -12,32 +12,59 @@
 {% endblock %}
 
 {% block body %}
+<h1>Grafica de asistencias virtuales por categoría</h1>
 <div class="container">
     <canvas id="myChart"></canvas>
 </div>
 
+{% if data %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Categoría</th>
+            <th scope="col">Asistencias brindadas</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay datos</p>
+{% endif %}
+
 <script>
-    var info = JSON.parse('{{ data }}');
-    console.log(info)
-    const ctx = document.getElementById('myChart');
-    new Chart(ctx, {
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: ['Cursos De Verano', 'Información General','Paquetes', 'Sin Categoria', 'Video Mappin', 'Visitas'],
-        datasets: [{
-          label: 'Mensajes Por Categoría',
-          data: info,
-          backgroundColor: [
-            'rgb(1, 190, 254)',
-            'rgb(255, 221, 0)',
-            'rgb(255, 125, 0)',
-            'rgb(255, 0, 109)',
-            'rgb(173, 255, 2)',
-            'rgb(143, 0, 255)'
+          labels: [
+              {% for row in data %}
+                  "{{ row[0] }}",
+              {% endfor %}
           ],
-          hoverOffset: 4
-        }]
+          datasets: [{
+              label: 'Asistencias brindadas',
+              data: [
+                  {% for row in data %}
+                      {{ row[1] }},
+                  {% endfor %}
+              ],
+              backgroundColor: [
+                'rgb(239, 71, 111)',
+                'rgb(247, 140, 107)',
+                'rgb(255, 209, 102)',
+                'rgb(6, 214, 160)',
+                'rgb(17, 138, 178)',
+                'rgb(7, 59, 76)'
+              ]
+          }]
       }
-    });
+  });
 </script>
 {% endblock %}

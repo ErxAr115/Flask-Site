@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block body %}
-<h1>Categorias entre fechas</h1>
+<h1>Grafica de asistencias virtuales por fechas</h1>
 <form action="/fechas" method="post">
     <label for="From">Fecha De Inicio:</label>
     <input type="date" name="From" id="From">
@@ -20,12 +20,33 @@
     <label for="To">Fecha Final:</label>
     <input type="date" name="To" id="To">
     <br>
-    <button type="submit">Buscar</button>
+    <button type="submit">Generar</button>
 </form>
 
 <div class="container">
     <canvas id="myChart"></canvas>
 </div>
+
+{% if data %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Categoría</th>
+            <th scope="col">Asistencias brindadas</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay datos</p>
+{% endif %}
 
 <script>
   var ctx = document.getElementById('myChart').getContext('2d');
@@ -38,7 +59,7 @@
               {% endfor %}
           ],
           datasets: [{
-              label: 'Mensajes recibidos',
+              label: 'Asistencias brindadas',
               data: [
                   {% for row in data %}
                       {{ row[1] }},
@@ -55,6 +76,5 @@
           }]
       }
   });
-</script>
 </script>
 {% endblock %}
