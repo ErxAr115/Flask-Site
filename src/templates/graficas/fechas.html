@@ -1,10 +1,12 @@
-{% extends './base.html' %}
+{% extends './site.html' %}
 
 {% block title %}Asistencia Virtual{% endblock %}
 
+{% block nombre%}{{ current_user.fullname }}{% endblock %}
+
 {% block customCSS %}
 <style>
-    .container{
+    .container {
         width: 500px;
         height: 500px;
     }
@@ -49,30 +51,30 @@
 {% endif %}
 
 <script>
-  var ctx = document.getElementById('myChart').getContext('2d');
-  var myChart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-          labels: [
-              {% for row in data %}
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for row in data %}
                   "{{ row[0] }}",
               {% endfor %}
           ],
-          datasets: [{
-              label: 'Asistencias brindadas',
-              data: [
-                  {% for row in data %}
+    datasets: [{
+        label: 'Asistencias brindadas',
+        data: [
+            {% for row in data %}
                       {{ row[1] }},
-                  {% endfor %}
-              ],
-              backgroundColor: [
-                'rgb(239, 71, 111)',
-                'rgb(247, 140, 107)',
-                'rgb(255, 209, 102)',
-                'rgb(6, 214, 160)',
-                'rgb(17, 138, 178)',
-                'rgb(7, 59, 76)'
-              ]
+    {% endfor %}
+    ],
+        backgroundColor: [
+            'rgb(239, 71, 111)',
+            'rgb(247, 140, 107)',
+            'rgb(255, 209, 102)',
+            'rgb(6, 214, 160)',
+            'rgb(17, 138, 178)',
+            'rgb(7, 59, 76)'
+        ]
           }]
       }
   });

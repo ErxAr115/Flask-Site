@@ -1,5 +1,4 @@
-import json
-from flask import Flask, jsonify, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_mysqldb import MySQL
 from config import config
@@ -48,6 +47,7 @@ def home():
     return render_template('home.html')
 
 @app.route('/categorias')
+@login_required
 def categorias():
     try:
         cursor = db.connection.cursor()
@@ -61,6 +61,7 @@ def categorias():
     return render_template('graficas/categorias.html', data = data)
 
 @app.route('/fechas', methods=['GET', 'POST'])
+@login_required
 def fechas():
     if request.method == 'POST':
         try:
@@ -77,6 +78,11 @@ def fechas():
         return render_template('graficas/fechas.html', data = data)
     else:
         return render_template('graficas/fechas.html')
+    
+@app.route('/encuestas')
+@login_required
+def encuestas():
+    return render_template('encuestas.html')
 
 def status401(error):
    return redirect(url_for('login'))

@@ -1,0 +1,27 @@
+{% extends './site.html' %}
+
+{% block title %}Página Principal{% endblock %}
+
+{% block customCSS %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}">
+{% endblock %}
+
+{% block nombre%}{{ current_user.fullname }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Encuestas</h1>
+    <div class="row">
+        <div class="col-4">
+            <div class="card" style="width: 300px;">
+                <div class="card-body">
+                    <h5 class="card-title">Encuestas #1</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <a href="#" class="btn btn-primary">Entrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
