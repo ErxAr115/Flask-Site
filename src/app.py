@@ -4,7 +4,6 @@ from flask_mysqldb import MySQL
 from config import config
 from models.ModelUser import ModelUser
 from models.entities.User import User
-from datetime import datetime
 
 app = Flask(__name__)
 db = MySQL(app)
@@ -84,18 +83,48 @@ def fechas():
 def encuestas():
     return render_template('encuestas.html')
 
+@app.route('/prueba', methods=['GET', 'POST'])
+@login_required
+def prueba():
+    if request.method == 'GET':
+        data = regresarPreguntas()
+        return render_template('encuestas/prueba.html', data = data)
+    elif request.method == 'POST':
+        data = regresarPreguntas()
+        pregunta = request.form.get('pregunta')
+        pregunta = int(pregunta)
+        mes = int(request.form.get('mes'))
+        year = int(request.form.get('year'))
+        print(mes, year)
+        try:
+            cursor = db.connection.cursor()
+            sql = "SELECT R.Respuesta, COUNT(RE.respuesta) FROM respuesta R JOIN regencuesta RE on R.idRespuesta = RE.respuesta WHERE (R.idPregunta = {} AND MONTH(RE.fecha_hora) = {} AND YEAR(RE.fecha_hora) = {}) GROUP BY R.Respuesta".format(pregunta, mes, year)
+            cursor.execute(sql)
+            respuestas = cursor.fetchall()
+            query = "Select Pregunta FROM pregunta WHERE idPregunta = {}".format(pregunta)
+            cursor.execute(query)
+            preg = cursor.fetchone()
+            print(preg[0])
+        except Exception as ex:
+            raise Exception(ex)
+        return render_template('encuestas/prueba.html', data = data, respuestas = respuestas, preg = preg)
+    
+def regresarPreguntas():
+    try:
+        cursor = db.connection.cursor()
+        sql = "SELECT idPregunta, Pregunta from pregunta where idEncuesta = 1"
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        cursor.close()
+    except Exception as ex:
+        raise Exception(ex)
+    return data
+
 def status401(error):
    return redirect(url_for('login'))
 
 def status404(error):
     return render_template('notFound.html'), 404
-
-def convertToList(row, indice):
-    lista_numeros = []
-    for element in row:
-        num = element[indice]
-        lista_numeros.append(num)
-    return lista_numeros
 
 if __name__ == '__main__':
     app.config.from_object(config['development'])
