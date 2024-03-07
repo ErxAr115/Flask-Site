@@ -52,7 +52,7 @@
 {% if respuestas %}
 <table class="table">
     <thead>
-        <h5>{{preg[0]}}</h5>
+        <h5>{{preg}}</h5>
         <th scope="col">Respuesta</th>
         <th scope="col"># de veces obtenida</th>
     </thead>
@@ -74,7 +74,7 @@
             plugins: {
                 title: {
                     display: true,
-                    text: '{{preg[0]}}'
+                    text: '{{preg}}'
                 }
             }
         },

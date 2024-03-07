@@ -104,11 +104,30 @@ def prueba():
             query = "Select Pregunta FROM pregunta WHERE idPregunta = {}".format(pregunta)
             cursor.execute(query)
             preg = cursor.fetchone()
-            print(preg[0])
+            preg = preg[0]
+            nombre = regresarMes(mes)
+            preg = preg + ' (' + nombre + ' - ' + str(year) + ')'
         except Exception as ex:
             raise Exception(ex)
         return render_template('encuestas/prueba.html', data = data, respuestas = respuestas, preg = preg)
-    
+
+def regresarMes(mes):
+    nombre = ''
+    match mes:
+        case 1: nombre = 'Enero'
+        case 2: nombre = 'Febrero'
+        case 3: nombre = 'Marzo'
+        case 4: nombre = 'Abril'
+        case 5: nombre = 'Mayo'
+        case 6: nombre = 'Junio'
+        case 7: nombre = 'Julio'
+        case 8: nombre = 'Agosto'
+        case 9: nombre = 'Septiembre'
+        case 10: nombre = 'Octubre'
+        case 11: nombre = 'Noviembre'
+        case 12: nombre = 'Diciembre'
+    return nombre
+
 def regresarPreguntas():
     try:
         cursor = db.connection.cursor()
