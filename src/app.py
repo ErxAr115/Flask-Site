@@ -4,6 +4,7 @@ from flask_mysqldb import MySQL
 from config import config
 from models.ModelUser import ModelUser
 from models.entities.User import User
+from datetime import datetime
 
 app = Flask(__name__)
 db = MySQL(app)
@@ -45,19 +46,21 @@ def logout():
 def home():
     return render_template('home.html')
 
-@app.route('/categorias')
+@app.route('/categorias', methods = ['GET', 'POST'])
 @login_required
 def categorias():
-    try:
-        cursor = db.connection.cursor()
-        sql = "SELECT categoria, COUNT(id) FROM registro_test GROUP BY categoria ORDER BY categoria ASC"
-        cursor.execute(sql)
-        data = cursor.fetchall()
-        print(data)
-        cursor.close()
-    except Exception as ex:
-        raise Exception(ex)
-    return render_template('graficas/categorias.html', data = data)
+    if request.method == 'POST':
+        try:
+            tipo = request.form['Tipo']
+            cursor = db.connection.cursor()
+            sql = "SELECT categoria, COUNT(id) FROM registro_test GROUP BY categoria ORDER BY categoria ASC"
+            cursor.execute(sql)
+            data = cursor.fetchall()
+        except Exception as ex:
+            raise Exception(ex)
+        return render_template('graficas/categorias.html', data=data, tipo=tipo)
+    else:
+        return render_template('graficas/categorias.html')
 
 @app.route('/fechas', methods=['GET', 'POST'])
 @login_required
@@ -66,15 +69,17 @@ def fechas():
         try:
             From = request.form['From']
             To = request.form['To']
+            tipo = request.form['Tipo']
             cursor = db.connection.cursor()
             sql = "SELECT categoria, COUNT(id) FROM registro_test WHERE fecha_hora BETWEEN '{}' AND '{}' GROUP BY categoria ORDER By categoria ASC".format(From, To)
             cursor.execute(sql)
             data = cursor.fetchall()
             cursor.close()
-            print(data)
+            print(tipo)
+            title = 'Periodo: ' + From + ' a ' + To
         except Exception as ex:
             raise Exception(ex)
-        return render_template('graficas/fechas.html', data = data)
+        return render_template('graficas/fechas.html', data = data, title=title, tipo=tipo)
     else:
         return render_template('graficas/fechas.html')
     
@@ -95,7 +100,7 @@ def prueba():
         pregunta = int(pregunta)
         mes = int(request.form.get('mes'))
         year = int(request.form.get('year'))
-        print(mes, year)
+        tipo = request.form['Tipo']
         try:
             cursor = db.connection.cursor()
             sql = "SELECT R.Respuesta, COUNT(RE.respuesta) FROM respuesta R JOIN regencuesta RE on R.idRespuesta = RE.respuesta WHERE (R.idPregunta = {} AND MONTH(RE.fecha_hora) = {} AND YEAR(RE.fecha_hora) = {}) GROUP BY R.Respuesta".format(pregunta, mes, year)
@@ -109,7 +114,7 @@ def prueba():
             preg = preg + ' (' + nombreMes + ' - ' + str(year) + ')'
         except Exception as ex:
             raise Exception(ex)
-        return render_template('encuestas/prueba.html', data = data, respuestas = respuestas, preg = preg)
+        return render_template('encuestas/prueba.html', data = data, respuestas = respuestas, preg = preg, tipo=tipo)
 
 def regresarMes(mes:int):
     nombre = ''

@@ -2,56 +2,62 @@
 
 {% block title %}Asistencia Virtual{% endblock %}
 
-{% block nombre%}{{ current_user.fullname }}{% endblock %}
-
 {% block customCSS %}
-<style>
-    .container {
-        width: 500px;
-        height: 500px;
-    }
-</style>
 {% endblock %}
 
 {% block body %}
-<h1>Grafica de asistencias virtuales por fechas</h1>
-<form action="/fechas" method="post">
+<h3 class="text-center text-white p2 bg-dark bg-gradient text-uppercase">Grafica de asistencias virtuales por fechas
+</h3>
+<form action="/fechas" method="post" class="text-center">
     <label for="From">Fecha De Inicio:</label>
     <input type="date" name="From" id="From">
-    <br>
     <label for="To">Fecha Final:</label>
     <input type="date" name="To" id="To">
-    <br>
+    <label for="Tipo">Selecciona un tipo de grafica:</label>
+    <select name="Tipo" id="Tipo">
+        <option value="bar">Barras</option>
+        <option value="pie">Pastel</option>
+    </select>
     <button type="submit">Generar</button>
 </form>
 
-<div class="container">
+{% if data %}
+<div class="container" style="width: 500px;">
     <canvas id="myChart"></canvas>
 </div>
 
-{% if data %}
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Categoría</th>
-            <th scope="col">Asistencias brindadas</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in data %}
-        <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-5">
+    <table class="table table-responsive table-bordered border-dark table-hover text-center text-capitalize">
+        <thead>
+            <tr class="table-dark table-active text-white">
+                <th scope="col">Categoría</th>
+                <th scope="col">Asistencias brindadas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endif %}
 
 <script>
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(ctx, {
-        type: 'pie',
+        type: '{{tipo}}',
+        options: {
+            plugins: {
+                title: {
+                    display: true,
+                    text: '{{title}}'
+                }
+            }
+        },
         data: {
             labels: [
                 {% for row in data %}

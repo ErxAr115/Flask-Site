@@ -2,19 +2,11 @@
 
 {% block title %}Asistencia Virtual{% endblock %}
 
-{%block nombre%}{{ current_user.fullname }}{% endblock %}
-
 {% block customCSS %}
-<style>
-    .container {
-        width: 500px;
-        height: 500px;
-    }
-</style>
 {% endblock %}
 
 {% block body%}
-<h4>Encuesta: Prueba</h4>
+<h3 class="text-center text-white p2 bg-dark bg-gradient text-uppercase">Encuesta: Prueba</h3>
 <form action="/prueba" method="post">
     <label for="pregunta">Selecciona una pregunta:</label>
     <select name="pregunta" id="pregunta">
@@ -37,39 +29,49 @@
         <option value="11">Noviembre</option>
         <option value="12">Diciembre</option>
     </select>
+    <br>
     <label for="year">Selecciona un año:</label>
     <select name="year" id="year">
         <option value="2023">2023</option>
         <option value="2024">2024</option>
     </select>
+    <label for="Tipo">Selecciona un tipo de grafica:</label>
+    <select name="Tipo" id="Tipo">
+        <option value="bar">Barras</option>
+        <option value="pie">Pastel</option>
+    </select>
     <button type="submit">Generar</button>
 </form>
 
-<div class="container">
+<div class="container" style="width: 500px;">
     <canvas id="myChart"></canvas>
 </div>
 
 {% if respuestas %}
-<table class="table">
-    <thead>
-        <h5>{{preg}}</h5>
-        <th scope="col">Respuesta</th>
-        <th scope="col"># de veces obtenida</th>
-    </thead>
-    <tbody>
-        {% for row in respuestas%}
-        <tr>
-            <td>{{row[0]}}</td>
-            <td>{{row[1]}}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-5">
+    <table class="table table-responsive table-bordered border-dark table-hover text-center text-capitalize">
+        <thead>
+            <h5 class="text-center">{{preg}}</h5>
+            <tr class="table-dark table-active text-white">
+                <th scope="col">Respuesta</th>
+                <th scope="col"># de veces obtenida</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in respuestas%}
+            <tr>
+                <td>{{row[0]}}</td>
+                <td>{{row[1]}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <script>
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(ctx, {
-        type: 'pie',
+        type: '{{tipo}}',
         options: {
             plugins: {
                 title: {
@@ -81,8 +83,8 @@
         data: {
             labels: [
                 {% for row in respuestas %}
-                "{{ row[0] }}",
-            {% endfor %}
+                    "{{ row[0] }}",
+                {% endfor %}
             ],
     datasets: [{
         label: 'Respuestas Obtenidas',
