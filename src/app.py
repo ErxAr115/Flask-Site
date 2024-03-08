@@ -87,10 +87,10 @@ def encuestas():
 @login_required
 def prueba():
     if request.method == 'GET':
-        data = regresarPreguntas()
+        data = regresarPreguntas(1)
         return render_template('encuestas/prueba.html', data = data)
     elif request.method == 'POST':
-        data = regresarPreguntas()
+        data = regresarPreguntas(1)
         pregunta = request.form.get('pregunta')
         pregunta = int(pregunta)
         mes = int(request.form.get('mes'))
@@ -105,13 +105,13 @@ def prueba():
             cursor.execute(query)
             preg = cursor.fetchone()
             preg = preg[0]
-            nombre = regresarMes(mes)
-            preg = preg + ' (' + nombre + ' - ' + str(year) + ')'
+            nombreMes = regresarMes(mes)
+            preg = preg + ' (' + nombreMes + ' - ' + str(year) + ')'
         except Exception as ex:
             raise Exception(ex)
         return render_template('encuestas/prueba.html', data = data, respuestas = respuestas, preg = preg)
 
-def regresarMes(mes):
+def regresarMes(mes:int):
     nombre = ''
     match mes:
         case 1: nombre = 'Enero'
@@ -128,10 +128,10 @@ def regresarMes(mes):
         case 12: nombre = 'Diciembre'
     return nombre
 
-def regresarPreguntas():
+def regresarPreguntas(idEncuesta):
     try:
         cursor = db.connection.cursor()
-        sql = "SELECT idPregunta, Pregunta from pregunta where idEncuesta = 1"
+        sql = "SELECT idPregunta, Pregunta from pregunta where idEncuesta = {}".format(idEncuesta)
         cursor.execute(sql)
         data = cursor.fetchall()
         cursor.close()
