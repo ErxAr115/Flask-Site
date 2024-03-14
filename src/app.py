@@ -4,7 +4,6 @@ from flask_mysqldb import MySQL
 from config import config
 from models.ModelUser import ModelUser
 from models.entities.User import User
-from datetime import datetime
 
 app = Flask(__name__)
 db = MySQL(app)
