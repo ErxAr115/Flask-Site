@@ -55,6 +55,7 @@ def categorias():
             sql = "SELECT categoria, COUNT(id) FROM registro_test GROUP BY categoria ORDER BY categoria ASC"
             cursor.execute(sql)
             data = cursor.fetchall()
+            print(data)
         except Exception as ex:
             raise Exception(ex)
         return render_template('graficas/categorias.html', data=data, tipo=tipo)
@@ -74,7 +75,7 @@ def fechas():
             cursor.execute(sql)
             data = cursor.fetchall()
             cursor.close()
-            print(tipo)
+            print(data)
             title = 'Periodo: ' + From + ' a ' + To
         except Exception as ex:
             raise Exception(ex)
