@@ -7,17 +7,57 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <h1>Encuestas</h1>
-    <div class="row">
-        <div class="col-4">
-            <div class="card" style="width: 300px;">
-                <div class="card-body">
-                    <h5 class="card-title">Encuesta: Prueba</h5>
-                    <a href="{{url_for('prueba')}}" class="btn btn-primary">Entrar</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<form action="/encuestas" method="post">
+    <label for="marca">Selecciona una marca:</label>
+    <select name="marca" id="marca">
+        {% for row in data %}
+        <option value="{{row[0]}}">{{row[1]}}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <label for="modelo">Selecciona un modelo:</label>
+    <select name="modelo" id="modelo">
+    </select>
+    <br>
+    <label for="mes">Selecciona un mes:</label>
+    <select name="mes" id="mes">
+        <option value="1">Enero</option>
+        <option value="2">Febrero</option>
+        <option value="3">Marzo</option>
+        <option value="4">Abril</option>
+        <option value="5">Mayo</option>
+        <option value="6">Junio</option>
+        <option value="7">Julio</option>
+        <option value="8">Agosto</option>
+        <option value="9">Septiembre</option>
+        <option value="10">Octubre</option>
+        <option value="11">Noviembre</option>
+        <option value="12">Diciembre</option>
+    </select>
+    <br>
+    <label for="year">Selecciona un año:</label>
+    <input name="year" id="year" type="number" min="2023" max="2050" step="1" value="2024" />
+    <br>
+    <input type="submit" value="Enviar">
+</form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#marca').change(function () {
+            var marca = $(this).val();
+            $.ajax({
+                url: '/get_models',
+                type: 'POST',
+                data: { marca: marca },
+                success: function (response) {
+                    var options = '';
+                    $.each(response.modelo, function (index, modelo) {
+                        options += '<option value="' + modelo.id + '">' + modelo.name + '</option>'
+                    })
+                    $('#modelo').html(options);
+                }
+            })
+        })
+    })
+</script>
 {% endblock %}

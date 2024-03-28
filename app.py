@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_mysqldb import MySQL
 from config import config
@@ -83,38 +83,33 @@ def fechas():
     else:
         return render_template('graficas/fechas.html')
     
-@app.route('/encuestas')
+@app.route('/encuestas', methods = ['GET', 'POST'])
 @login_required
 def encuestas():
-    return render_template('encuestas.html')
-
-@app.route('/prueba', methods=['GET', 'POST'])
-@login_required
-def prueba():
     if request.method == 'GET':
-        data = regresarPreguntas(1)
-        return render_template('encuestas/prueba.html', data = data)
-    elif request.method == 'POST':
-        data = regresarPreguntas(1)
-        pregunta = request.form.get('pregunta')
-        pregunta = int(pregunta)
-        mes = int(request.form.get('mes'))
-        year = int(request.form.get('year'))
-        tipo = request.form['Tipo']
-        try:
-            cursor = db.connection.cursor()
-            sql = "SELECT R.Respuesta, COUNT(RE.respuesta) FROM respuesta R JOIN regencuesta RE on R.idRespuesta = RE.respuesta WHERE (R.idPregunta = {} AND MONTH(RE.fecha_hora) = {} AND YEAR(RE.fecha_hora) = {}) GROUP BY R.Respuesta".format(pregunta, mes, year)
-            cursor.execute(sql)
-            respuestas = cursor.fetchall()
-            query = "Select Pregunta FROM pregunta WHERE idPregunta = {}".format(pregunta)
-            cursor.execute(query)
-            preg = cursor.fetchone()
-            preg = preg[0]
-            nombreMes = regresarMes(mes)
-            preg = preg + ' (' + nombreMes + ' - ' + str(year) + ')'
-        except Exception as ex:
-            raise Exception(ex)
-        return render_template('encuestas/prueba.html', data = data, respuestas = respuestas, preg = preg, tipo=tipo)
+        data = regresarEncuestas()
+        return render_template('encuestas.html', data = data)
+    else:
+        encuestas = request.form['marca']
+        print(encuestas)
+        data = regresarEncuestas()
+        return render_template('encuestas.html', data = data)
+
+
+@app.route('/get_models', methods=['POST'])
+def getModels():
+    marca = request.form['marca']
+    marca = int(marca)
+    try:
+        cursor = db.connection.cursor()
+        sql = "SELECT idPregunta, Pregunta from pregunta where idEncuesta = {}".format(marca)
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        cursor.close()
+    except Exception as ex:
+        raise Exception(ex)
+    modelo = [{'id': row[0], 'name': row[1]} for row in data]
+    return jsonify({'modelo': modelo})
 
 def regresarMes(mes:int):
     nombre = ''
@@ -133,10 +128,10 @@ def regresarMes(mes:int):
         case 12: nombre = 'Diciembre'
     return nombre
 
-def regresarPreguntas(idEncuesta):
+def regresarEncuestas():
     try:
         cursor = db.connection.cursor()
-        sql = "SELECT idPregunta, Pregunta from pregunta where idEncuesta = {}".format(idEncuesta)
+        sql = "SELECT idEncuesta, Nombre from encuesta"
         cursor.execute(sql)
         data = cursor.fetchall()
         cursor.close()
